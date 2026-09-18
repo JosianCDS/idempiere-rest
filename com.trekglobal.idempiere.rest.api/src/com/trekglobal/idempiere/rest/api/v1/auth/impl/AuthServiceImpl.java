@@ -90,6 +90,7 @@ import com.trekglobal.idempiere.rest.api.v1.jwt.TokenUtils;
 public class AuthServiceImpl implements AuthService {
 
 	private static LogAuthFailure logAuthFailure = new LogAuthFailure();
+	public static final String REST_V1_AUTH_ENABLED = "REST_V1_AUTH_ENABLED";
 
 	public static final String ROLE_TYPES_WEBSERVICE = "NULL,WS";  //webservice+null
 
@@ -106,6 +107,9 @@ public class AuthServiceImpl implements AuthService {
 	 */
 	@Override
 	public Response authenticate(LoginCredential credential) {
+		if (!isV1AuthEnabled())
+			return v1AuthDisabled();
+
 		Login login = new Login(Env.getCtx());
 		KeyNamePair[] clients = login.getClients(credential.getUserName(), credential.getPassword(), ROLE_TYPES_WEBSERVICE);
 		if (clients == null || clients.length == 0) {
@@ -371,9 +375,23 @@ public class AuthServiceImpl implements AuthService {
 	 */
 	@Override
 	public Response changeLoginParameters(LoginParameters parameters) {
+		if (!isV1AuthEnabled())
+			return v1AuthDisabled();
+
 		String userName = Env.getContext(Env.getCtx(), RequestFilter.LOGIN_NAME);
 		String clients = Env.getContext(Env.getCtx(), RequestFilter.LOGIN_CLIENTS);
 		return processLoginParameters(parameters, userName, clients);
+	}
+
+	private boolean isV1AuthEnabled() {
+		return MSysConfig.getBooleanValue(REST_V1_AUTH_ENABLED, true);
+	}
+
+	private Response v1AuthDisabled() {
+		JsonObject response = new JsonObject();
+		response.addProperty("error", "v1_auth_disabled");
+		response.addProperty("message", "Authentication through API v1 is disabled; use /api/v2/auth/tokens");
+		return Response.status(Status.GONE).entity(response.toString()).build();
 	}
 
 	/**

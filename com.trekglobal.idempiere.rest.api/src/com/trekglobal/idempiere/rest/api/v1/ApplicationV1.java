@@ -60,6 +60,7 @@ import com.trekglobal.idempiere.rest.api.v1.resource.impl.ViewResourceImpl;
 import com.trekglobal.idempiere.rest.api.v1.resource.impl.WindowResourceImpl;
 import com.trekglobal.idempiere.rest.api.v1.resource.impl.WebhookInboundResourceImpl;
 import com.trekglobal.idempiere.rest.api.v1.resource.impl.WorkflowResourceImpl;
+import com.trekglobal.idempiere.rest.api.v2.auth.impl.AuthServiceV2Impl;
 
 /**
  * @author hengsin
@@ -78,6 +79,7 @@ public class ApplicationV1 extends Application {
         final Set<Class<?>> classes = new HashSet<Class<?>>();
         
         classes.add(AuthServiceImpl.class);
+        classes.add(AuthServiceV2Impl.class);
         classes.add(RequestFilter.class);
         classes.add(RequestSetLanguageFilter.class);
         classes.add(ResponseFilter.class);

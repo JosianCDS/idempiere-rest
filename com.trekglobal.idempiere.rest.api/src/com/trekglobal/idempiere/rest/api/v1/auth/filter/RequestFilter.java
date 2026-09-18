@@ -88,6 +88,7 @@ public class RequestFilter implements ContainerRequestFilter {
 		ServerContext.setCurrentInstance(ctx);
 		
 		if (   HttpMethod.OPTIONS.equals(requestContext.getMethod())
+			|| isV2PreAuthenticationPath(requestContext)
 			|| (   HttpMethod.POST.equals(requestContext.getMethod())
 				&& requestContext.getUriInfo().getPath().endsWith("v1/auth/tokens")
 				)
@@ -139,13 +140,13 @@ public class RequestFilter implements ContainerRequestFilter {
 				validate(authHeaderValues[1], requestContext);
 				if (Util.isEmpty(Env.getContext(Env.getCtx(), Env.AD_USER_ID)) ||
 					Util.isEmpty(Env.getContext(Env.getCtx(), Env.AD_ROLE_ID))) {
-					if (!requestContext.getUriInfo().getPath().startsWith("v1/auth/")) {
+					if (!isAuthenticationPath(requestContext.getUriInfo().getPath())) {
 						requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
 					}
 				}
 				//check resource access by role (if enable)
 				if (MRestResourceAccess.isResourceAccessByRole()) {
-					if (!requestContext.getUriInfo().getPath().startsWith("v1/auth/")) {
+					if (!isAuthenticationPath(requestContext.getUriInfo().getPath())) {
 						if (!MRestResourceAccess.hasAccess(requestContext.getUriInfo().getPath(true), requestContext.getMethod())) {
 							requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
 						}
@@ -161,6 +162,21 @@ public class RequestFilter implements ContainerRequestFilter {
 		} else {
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
 		}
+	}
+
+	private boolean isV2PreAuthenticationPath(ContainerRequestContext requestContext) {
+		String path = requestContext.getUriInfo().getPath();
+		return (HttpMethod.POST.equals(requestContext.getMethod()) && path.endsWith("v2/auth/tokens"))
+				|| (HttpMethod.PUT.equals(requestContext.getMethod()) && path.endsWith("v2/auth/tokens"))
+				|| (HttpMethod.POST.equals(requestContext.getMethod()) && path.endsWith("v2/auth/mfa/verify"))
+				|| (HttpMethod.GET.equals(requestContext.getMethod()) && path.endsWith("v2/auth/roles"))
+				|| (HttpMethod.GET.equals(requestContext.getMethod()) && path.endsWith("v2/auth/organizations"))
+				|| (HttpMethod.GET.equals(requestContext.getMethod()) && path.endsWith("v2/auth/warehouses"))
+				|| (HttpMethod.GET.equals(requestContext.getMethod()) && path.endsWith("v2/auth/language"));
+	}
+
+	private boolean isAuthenticationPath(String path) {
+		return path.startsWith("v1/auth/") || path.startsWith("v2/auth/");
 	}
 
 	private void validate(String token, ContainerRequestContext requestContext) throws IllegalArgumentException, UnsupportedEncodingException {

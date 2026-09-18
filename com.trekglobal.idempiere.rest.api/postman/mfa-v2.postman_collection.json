@@ -1,0 +1,57 @@
+{
+  "info": {"name": "iDempiere REST v2 Progressive MFA/TOTP", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "variable": [
+    {"key": "baseUrl", "value": "https://localhost:8443/api/v2"},
+    {"key": "challengeToken", "value": ""},
+    {"key": "jwt", "value": ""},
+    {"key": "registrationId", "value": ""},
+    {"key": "clientId", "value": "11"},
+    {"key": "roleId", "value": "102"},
+    {"key": "organizationId", "value": "11"},
+    {"key": "warehouseId", "value": "103"}
+  ],
+  "item": [
+    {
+      "name": "Progressive authentication",
+      "item": [
+        {
+          "name": "1 - Credentials and clients",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"userName\": \"GardenAdmin\",\n  \"password\": \"GardenAdmin\"\n}"}, "url": "{{baseUrl}}/auth/tokens"},
+          "event": [{"listen": "test", "script": {"exec": ["const j = pm.response.json();", "if (j.challengeToken) pm.collectionVariables.set('challengeToken', j.challengeToken);"]}}]
+        },
+        {
+          "name": "2 - Select client",
+          "request": {"method": "PUT", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"challengeToken\": \"{{challengeToken}}\",\n  \"parameters\": {\n    \"clientId\": \"{{clientId}}\"\n  }\n}"}, "url": "{{baseUrl}}/auth/tokens"},
+          "event": [{"listen": "test", "script": {"exec": ["const j = pm.response.json();", "if (j.challengeToken) pm.collectionVariables.set('challengeToken', j.challengeToken);", "if (j.methods && j.methods.length) pm.collectionVariables.set('registrationId', j.methods[0].registrationId);"]}}]
+        },
+        {
+          "name": "3 - Verify TOTP (skip when no MFA)",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"challengeToken\": \"{{challengeToken}}\",\n  \"registrationId\": {{registrationId}},\n  \"code\": \"123456\"\n}"}, "url": "{{baseUrl}}/auth/mfa/verify"},
+          "event": [{"listen": "test", "script": {"exec": ["const j = pm.response.json();", "if (j.challengeToken) pm.collectionVariables.set('challengeToken', j.challengeToken);"]}}]
+        },
+        {"name": "4 - Roles", "request": {"method": "GET", "header": [{"key": "X-Auth-Challenge", "value": "{{challengeToken}}"}], "url": "{{baseUrl}}/auth/roles"}},
+        {"name": "5 - Organizations", "request": {"method": "GET", "header": [{"key": "X-Auth-Challenge", "value": "{{challengeToken}}"}], "url": "{{baseUrl}}/auth/organizations?role={{roleId}}"}},
+        {"name": "6 - Warehouses", "request": {"method": "GET", "header": [{"key": "X-Auth-Challenge", "value": "{{challengeToken}}"}], "url": "{{baseUrl}}/auth/warehouses?role={{roleId}}&organization={{organizationId}}"}},
+        {
+          "name": "7 - Issue final tokens",
+          "request": {"method": "PUT", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"challengeToken\": \"{{challengeToken}}\",\n  \"parameters\": {\n    \"clientId\": \"{{clientId}}\",\n    \"roleId\": \"{{roleId}}\",\n    \"organizationId\": \"{{organizationId}}\",\n    \"warehouseId\": \"{{warehouseId}}\",\n    \"language\": \"en_US\"\n  }\n}"}, "url": "{{baseUrl}}/auth/tokens"},
+          "event": [{"listen": "test", "script": {"exec": ["const j = pm.response.json();", "if (j.token) pm.collectionVariables.set('jwt', j.token);"]}}]
+        }
+      ]
+    },
+    {
+      "name": "TOTP self-service (requires JWT)",
+      "item": [
+        {"name": "1 - List TOTP methods", "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}], "url": "{{baseUrl}}/auth/mfa/methods"}},
+        {
+          "name": "2 - Begin TOTP registration",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"methodId\": 200000,\n  \"name\": \"My phone\"\n}"}, "url": "{{baseUrl}}/auth/mfa/registrations"},
+          "event": [{"listen": "test", "script": {"exec": ["const j = pm.response.json();", "if (j.registrationId) pm.collectionVariables.set('registrationId', j.registrationId);"]}}]
+        },
+        {"name": "3 - Complete TOTP registration", "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"code\": \"123456\",\n  \"name\": \"My phone\",\n  \"preferred\": true\n}"}, "url": "{{baseUrl}}/auth/mfa/registrations/{{registrationId}}/complete"}},
+        {"name": "4 - List registrations", "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}], "url": "{{baseUrl}}/auth/mfa/registrations"}},
+        {"name": "5 - Revoke registration", "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{jwt}}"}], "url": "{{baseUrl}}/auth/mfa/registrations/{{registrationId}}"}}
+      ]
+    }
+  ]
+}

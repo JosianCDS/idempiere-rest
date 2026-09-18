@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idempiere Name="2Pack_1.0.23" Version="1.0.23" idempiereVersion="12" DataBaseVersion="" Description="REST API v2 authentication SysConfig defaults" Author="Casa del Software" AuthorEmail="" CreatedDate="2026-09-15 20:55:00.000" UpdatedDate="2026-09-15 20:55:00.000" PackOutVersion="100" UpdateDictionary="false" Client="0-SYSTEM-System" AD_Client_UU="11237b53-9592-4af1-b3c5-afd216514b5d">
+    <AD_SysConfig type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <IsActive>Y</IsActive>
+        <Name>REST_MFA_CHALLENGE_EXPIRATION_SECONDS</Name>
+        <Value>300</Value>
+        <Description>Lifetime in seconds of an MFA authentication challenge. Client-specific values may override this default.</Description>
+        <EntityType>IR</EntityType>
+        <ConfigurationLevel>C</ConfigurationLevel>
+        <AD_SysConfig_UU>9ccd4a3a-6af5-4d82-9f74-fddeaa10df40</AD_SysConfig_UU>
+    </AD_SysConfig>
+    <AD_SysConfig type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <IsActive>Y</IsActive>
+        <Name>REST_CONTEXT_CHALLENGE_EXPIRATION_SECONDS</Name>
+        <Value>900</Value>
+        <Description>Lifetime in seconds of a progressive authentication context challenge. Client-specific values may override this default.</Description>
+        <EntityType>IR</EntityType>
+        <ConfigurationLevel>C</ConfigurationLevel>
+        <AD_SysConfig_UU>b989ccae-ff7b-4470-8b8e-8e77ed457712</AD_SysConfig_UU>
+    </AD_SysConfig>
+    <AD_SysConfig type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <IsActive>Y</IsActive>
+        <Name>REST_MFA_MAX_ATTEMPTS</Name>
+        <Value>5</Value>
+        <Description>Maximum failed TOTP validation attempts before the authentication challenge is blocked. Client-specific values may override this default.</Description>
+        <EntityType>IR</EntityType>
+        <ConfigurationLevel>C</ConfigurationLevel>
+        <AD_SysConfig_UU>fad24f05-e9ed-457d-b3b9-aa675362c098</AD_SysConfig_UU>
+    </AD_SysConfig>
+    <AD_SysConfig type="table">
+        <AD_Client_ID>0</AD_Client_ID>
+        <AD_Org_ID>0</AD_Org_ID>
+        <IsActive>Y</IsActive>
+        <Name>REST_V1_AUTH_ENABLED</Name>
+        <Value>Y</Value>
+        <Description>Master switch for POST and PUT /api/v1/auth/tokens. Set to N to require the API v2 authentication flow.</Description>
+        <EntityType>IR</EntityType>
+        <ConfigurationLevel>S</ConfigurationLevel>
+        <AD_SysConfig_UU>13cc873c-b657-440e-9626-f1ac232b4319</AD_SysConfig_UU>
+    </AD_SysConfig>
+</idempiere>
+

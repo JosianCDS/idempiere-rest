@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idempiere Name="2Pack_1.0.22" Version="1.0.22" idempiereVersion="12" DataBaseVersion="" Description="REST API v2 progressive MFA challenge state" Author="Casa del Software" AuthorEmail="" CreatedDate="2026-09-15 19:00:00.000" UpdatedDate="2026-09-15 19:00:00.000" PackOutVersion="100" UpdateDictionary="false" Client="0-SYSTEM-System" AD_Client_UU="11237b53-9592-4af1-b3c5-afd216514b5d">
+  <SQLMandatory type="custom">
+    <DBType>ALL</DBType>
+    <statement><![CDATA[ALTER TABLE REST_AuthChallenge ADD ChallengeState VARCHAR(30) DEFAULT 'CLIENT_REQUIRED' NOT NULL]]></statement>
+  </SQLMandatory>
+  <SQLMandatory type="custom">
+    <DBType>ALL</DBType>
+    <statement><![CDATA[ALTER TABLE REST_AuthChallenge ADD MFAVerifiedAt TIMESTAMP]]></statement>
+  </SQLMandatory>
+  <SQLMandatory type="custom">
+    <DBType>ALL</DBType>
+    <statement><![CDATA[ALTER TABLE REST_AuthChallenge ADD MFA_Registration_ID NUMERIC(10)]]></statement>
+  </SQLMandatory>
+</idempiere>

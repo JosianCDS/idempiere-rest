@@ -1,0 +1,139 @@
+openapi: 3.0.3
+info:
+  title: iDempiere REST API v2 Authentication
+  version: 2.1.0
+  description: Progressive password/TOTP authentication and TOTP self-service for iDempiere Release 12.
+servers:
+  - url: https://localhost:8443/api/v2
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+    challengeAuth: {type: apiKey, in: header, name: X-Auth-Challenge}
+  schemas:
+    LoginParameters:
+      type: object
+      properties:
+        clientId: {type: string, example: '11'}
+        roleId: {type: string, example: '102'}
+        organizationId: {type: string, example: '11'}
+        warehouseId: {type: string, example: '103'}
+        language: {type: string, example: en_US}
+    AuthRequest:
+      type: object
+      required: [userName, password]
+      properties:
+        userName: {type: string, example: GardenAdmin}
+        password: {type: string, format: password}
+        parameters: {$ref: '#/components/schemas/LoginParameters'}
+    ContextRequest:
+      type: object
+      required: [challengeToken, parameters]
+      properties:
+        challengeToken: {type: string}
+        parameters: {$ref: '#/components/schemas/LoginParameters'}
+    MFAVerificationRequest:
+      type: object
+      required: [challengeToken, registrationId, code]
+      properties:
+        challengeToken: {type: string}
+        registrationId: {type: integer}
+        code: {type: string, example: '123456'}
+    MFARegistrationRequest:
+      type: object
+      required: [methodId]
+      properties:
+        methodId: {type: integer, example: 200000}
+        name: {type: string, example: My phone}
+    MFARegistrationCompleteRequest:
+      type: object
+      required: [code]
+      properties:
+        code: {type: string, example: '123456'}
+        name: {type: string, example: My phone}
+        preferred: {type: boolean, default: false}
+paths:
+  /auth/tokens:
+    post:
+      summary: Validate credentials and return clients, or start direct authentication
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/AuthRequest'}}}
+      responses:
+        '200': {description: Client selection required or authentication completed}
+        '202': {description: TOTP verification required}
+        '401': {description: Invalid credentials}
+    put:
+      summary: Select client or finish a progressive context
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/ContextRequest'}}}
+      responses:
+        '200': {description: Context challenge or operational tokens}
+        '202': {description: TOTP verification required}
+        '403': {description: Configured MFA method is unsupported}
+  /auth/mfa/verify:
+    post:
+      summary: Verify TOTP and rotate to a context challenge or issue direct-login tokens
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/MFAVerificationRequest'}}}
+      responses:
+        '200': {description: Context challenge or operational tokens}
+        '401': {description: Invalid code, registration or challenge}
+  /auth/roles:
+    get:
+      summary: List roles for the selected client
+      security: [{challengeAuth: []}]
+      responses: {'200': {description: Roles and renewed context challenge lifetime}, '401': {description: Invalid challenge}}
+  /auth/organizations:
+    get:
+      summary: Validate a role and list its organizations
+      security: [{challengeAuth: []}]
+      parameters: [{in: query, name: role, required: true, schema: {type: integer}}]
+      responses: {'200': {description: Organizations}, '401': {description: Invalid role or challenge}}
+  /auth/warehouses:
+    get:
+      summary: Validate role and organization and list warehouses
+      security: [{challengeAuth: []}]
+      parameters:
+        - {in: query, name: role, required: true, schema: {type: integer}}
+        - {in: query, name: organization, required: true, schema: {type: integer}}
+      responses: {'200': {description: Warehouses}, '401': {description: Invalid context or challenge}}
+  /auth/language:
+    get:
+      summary: Get the selected client's default language
+      security: [{challengeAuth: []}]
+      responses: {'200': {description: Client language}, '401': {description: Invalid challenge}}
+  /auth/mfa/methods:
+    get:
+      summary: List active TOTP methods
+      security: [{bearerAuth: []}]
+      responses: {'200': {description: TOTP methods}}
+  /auth/mfa/registrations:
+    get:
+      summary: List the current user's registrations, or a tenant user's registrations for administrators
+      security: [{bearerAuth: []}]
+      parameters: [{in: query, name: userId, required: false, schema: {type: integer}}]
+      responses: {'200': {description: Registrations without secrets}, '403': {description: Administrator access required}}
+    post:
+      summary: Begin TOTP registration for the authenticated user
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/MFARegistrationRequest'}}}
+      responses: {'201': {description: Registration, QR data URI and one-time secret}, '400': {description: Registration failed}}
+  /auth/mfa/registrations/{id}/complete:
+    post:
+      summary: Validate and complete the authenticated user's pending registration
+      security: [{bearerAuth: []}]
+      parameters: [{in: path, name: id, required: true, schema: {type: integer}}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/MFARegistrationCompleteRequest'}}}
+      responses: {'200': {description: Registration completed}, '401': {description: Invalid code}}
+  /auth/mfa/registrations/{id}:
+    delete:
+      summary: Revoke an owned registration or, for administrators, one in the same tenant
+      security: [{bearerAuth: []}]
+      parameters: [{in: path, name: id, required: true, schema: {type: integer}}]
+      responses: {'204': {description: Revoked}, '404': {description: Registration not accessible}}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idempiere Name="2Pack_1.0.21" Version="1.0.21" idempiereVersion="12" DataBaseVersion="" Description="REST API v2 MFA authentication challenge storage" Author="Casa del Software" AuthorEmail="" CreatedDate="2026-09-15 18:30:00.000" UpdatedDate="2026-09-15 18:30:00.000" PackOutVersion="100" UpdateDictionary="false" Client="0-SYSTEM-System" AD_Client_UU="11237b53-9592-4af1-b3c5-afd216514b5d">
+  <SQLMandatory type="custom">
+    <DBType>ALL</DBType>
+    <statement><![CDATA[
+CREATE TABLE REST_AuthChallenge (
+  REST_AuthChallenge_UU VARCHAR(36) NOT NULL,
+  AD_Client_ID NUMERIC(10) NOT NULL,
+  AD_Org_ID NUMERIC(10) NOT NULL,
+  IsActive CHAR(1) DEFAULT 'Y' NOT NULL,
+  Created TIMESTAMP NOT NULL,
+  CreatedBy NUMERIC(10) NOT NULL,
+  Updated TIMESTAMP NOT NULL,
+  UpdatedBy NUMERIC(10) NOT NULL,
+  TokenHash VARCHAR(64) NOT NULL,
+  AD_User_ID NUMERIC(10) NOT NULL,
+  UserName VARCHAR(255) NOT NULL,
+  AllowedClients VARCHAR(2000) NOT NULL,
+  ClientParameter VARCHAR(255),
+  RoleParameter VARCHAR(255),
+  OrgParameter VARCHAR(255),
+  WarehouseParameter VARCHAR(255),
+  Language VARCHAR(10),
+  ExpiresAt TIMESTAMP NOT NULL,
+  AttemptCount NUMERIC(10) DEFAULT 0 NOT NULL,
+  ConsumedAt TIMESTAMP,
+  CONSTRAINT REST_AuthChallenge_Key PRIMARY KEY (REST_AuthChallenge_UU),
+  CONSTRAINT REST_AuthChallenge_Token_UQ UNIQUE (TokenHash)
+)
+    ]]></statement>
+  </SQLMandatory>
+  <SQLMandatory type="custom">
+    <DBType>ALL</DBType>
+    <statement><![CDATA[CREATE INDEX REST_AuthChallenge_Expiry ON REST_AuthChallenge (ExpiresAt, IsActive)]]></statement>
+  </SQLMandatory>
+</idempiere>
