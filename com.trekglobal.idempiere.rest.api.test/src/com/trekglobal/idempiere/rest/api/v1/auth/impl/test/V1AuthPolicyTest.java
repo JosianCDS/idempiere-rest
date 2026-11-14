@@ -17,6 +17,21 @@ import com.trekglobal.idempiere.rest.api.v1.auth.impl.AuthServiceImpl;
 public class V1AuthPolicyTest {
 
 	@Test
+	void enabledV1UsesSharedTokenIssuer() {
+		try (MockedStatic<MSysConfig> config = mockStatic(MSysConfig.class)) {
+			config.when(() -> MSysConfig.getBooleanValue(AuthServiceImpl.REST_V1_AUTH_ENABLED, true)).thenReturn(true);
+			Response expected = Response.ok("shared-issuer").build();
+			AuthServiceImpl service = new AuthServiceImpl() {
+				@Override
+				public Response issueTokensForAuthenticatedContext(LoginParameters parameters) {
+					return expected;
+				}
+			};
+			assertEquals(expected, service.changeLoginParameters(new LoginParameters()));
+		}
+	}
+
+	@Test
 	void v1TokenEndpointsReturnGoneWhenAuthenticationIsDisabled() {
 		try (MockedStatic<MSysConfig> config = mockStatic(MSysConfig.class)) {
 			config.when(() -> MSysConfig.getBooleanValue(AuthServiceImpl.REST_V1_AUTH_ENABLED, true)).thenReturn(false);

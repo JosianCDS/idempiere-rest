@@ -378,6 +378,10 @@ public class AuthServiceImpl implements AuthService {
 		if (!isV1AuthEnabled())
 			return v1AuthDisabled();
 
+		return issueTokensForAuthenticatedContext(parameters);
+	}
+
+	public Response issueTokensForAuthenticatedContext(LoginParameters parameters) {
 		String userName = Env.getContext(Env.getCtx(), RequestFilter.LOGIN_NAME);
 		String clients = Env.getContext(Env.getCtx(), RequestFilter.LOGIN_CLIENTS);
 		return processLoginParameters(parameters, userName, clients);

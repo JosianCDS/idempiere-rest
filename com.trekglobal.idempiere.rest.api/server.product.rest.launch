@@ -61,6 +61,7 @@
     <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -console"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
@@ -139,7 +140,7 @@
         <setEntry value="jakarta.xml.bind-api@default:default"/>
         <setEntry value="jakarta.xml.soap-api@default:default"/>
         <setEntry value="jakarta.xml.ws-api@default:default"/>
-        <setEntry value="javassist*3.30.2.GA@default:default"/>
+        <setEntry value="javassist@default:default"/>
         <setEntry value="javax.enterprise.cdi-api@default:default"/>
         <setEntry value="javax.interceptor-api@default:default"/>
         <setEntry value="javax.security.auth.message-api@default:default"/>
@@ -357,11 +358,11 @@
         <setEntry value="org.krysalis.barcode4j@default:default"/>
         <setEntry value="org.mortbay.jasper.apache-el@default:default"/>
         <setEntry value="org.mortbay.jasper.apache-jsp@default:default"/>
-        <setEntry value="org.objectweb.asm*9.9.1@default:default"/>
         <setEntry value="org.objectweb.asm.commons@default:default"/>
-        <setEntry value="org.objectweb.asm.tree*9.9.1@default:default"/>
-        <setEntry value="org.objectweb.asm.tree.analysis*9.9.1@default:default"/>
-        <setEntry value="org.objectweb.asm.util*9.9.1@default:default"/>
+        <setEntry value="org.objectweb.asm.tree.analysis@default:default"/>
+        <setEntry value="org.objectweb.asm.tree@default:default"/>
+        <setEntry value="org.objectweb.asm.util@default:default"/>
+        <setEntry value="org.objectweb.asm@default:default"/>
         <setEntry value="org.osgi.annotation.bundle@default:default"/>
         <setEntry value="org.osgi.annotation.versioning@default:default"/>
         <setEntry value="org.osgi.service.cm@default:default"/>
@@ -387,7 +388,6 @@
         <setEntry value="org.osgi.util.pushstream@default:default"/>
         <setEntry value="org.osgi.util.tracker@default:default"/>
         <setEntry value="org.osgi.util.xml@default:default"/>
-        <setEntry value="org.owasp.encoder@default:default"/>
         <setEntry value="org.passay@default:default"/>
         <setEntry value="org.postgresql.jdbc@default:default"/>
         <setEntry value="org.sat4j.core@default:default"/>
@@ -451,7 +451,6 @@
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
         <setEntry value="com.trekglobal.idempiere.rest.api@5:true"/>
-        <setEntry value="javax.websocket-api.fragment@default:false"/>
         <setEntry value="org.adempiere.base.callout@default:default"/>
         <setEntry value="org.adempiere.base.process@default:default"/>
         <setEntry value="org.adempiere.base@default:default"/>
@@ -471,8 +470,6 @@
         <setEntry value="org.apache.ecs@default:default"/>
         <setEntry value="org.compiere.db.oracle.provider@default:default"/>
         <setEntry value="org.compiere.db.postgresql.provider@default:default"/>
-        <setEntry value="org.idempiere.acct@5:true"/>
-        <setEntry value="org.idempiere.extension.manager@default:true"/>
         <setEntry value="org.idempiere.felix.webconsole@default:true"/>
         <setEntry value="org.idempiere.hazelcast.service@default:default"/>
         <setEntry value="org.idempiere.jetty.osgi.boot.fragment@default:false"/>

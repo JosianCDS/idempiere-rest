@@ -286,7 +286,7 @@ public class AuthServiceV2Impl implements AuthServiceV2 {
 
 	private Response issueTokens(MAuthChallenge challenge) {
 		setIdentityContext(challenge, resolveClientId(challenge.getParameters().getClientId()));
-		return v1().changeLoginParameters(challenge.getParameters());
+		return v1().issueTokensForAuthenticatedContext(challenge.getParameters());
 	}
 
 	private AuthServiceImpl v1() { AuthServiceImpl service = new AuthServiceImpl(); service.setRequest(servletRequest); return service; }
